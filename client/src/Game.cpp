@@ -12,6 +12,7 @@
 #include "systems/PhysicsSystem.h"
 #include "systems/BoxMovementSystem.h"
 #include "InputManager.h"
+#include "net/Client.h"
 
 Game::~Game()
 {
@@ -19,6 +20,7 @@ Game::~Game()
 	delete renderSystem;
 	delete physicsSystem;
 	delete boxMovementSystem;
+	delete client;
 	delete kRenderer;
 }
 
@@ -67,18 +69,44 @@ bool Game::SetUp(int screenWidth, int screenHeight) {
 	bool success = true;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
-	kRenderer = new KRenderer();
-	if (kRenderer->Initialize(screenWidth, screenHeight))
+
+	client = new Client();
+
+	std::cout<<"Enter port to receive packets on: ";
+	std::string portToOpenInput;
+	std::cin >> portToOpenInput;
+	std::cout<<"Input IP and Port in aaaa.bbbb.cccc.dddd:xxxx format: ";
+	std::string ipInput;
+	std::cin >> ipInput;
+	std::cin.ignore();
+
+	unsigned int networkId;
+	if (client->ConnectToServer(networkId, portToOpenInput, ipInput))
 	{
-		//Initialize systems
-		renderSystem = new RenderSystem();
-		inputSystem = new InputSystem();
-		physicsSystem = new PhysicsSystem();
-		boxMovementSystem = new BoxMovementSystem();
+		std::cout<<"Message to send: ";
+		std::string message;
+		getline(std::cin, message);
+
+		client->SendMessage(networkId, message);
+		
+		kRenderer = new KRenderer();
+		if (kRenderer->Initialize(screenWidth, screenHeight))
+		{
+			//Initialize systems
+			renderSystem = new RenderSystem();
+			inputSystem = new InputSystem();
+			physicsSystem = new PhysicsSystem();
+			boxMovementSystem = new BoxMovementSystem();
+		}
+		else
+		{
+			std::cout<<"Could not initialize renderer"<<std::endl;
+			success = false;
+		}
 	}
 	else
 	{
-		std::cout<<"Could not initialize renderer"<<std::endl;
+		std::cout<<"Could not connect to server"<<std::endl;
 		success = false;
 	}
 

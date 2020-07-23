@@ -5,6 +5,7 @@ class RenderSystem;
 class PhysicsSystem;
 class BoxMovementSystem;
 class KRenderer;
+class Client;
 
 class Game
 {
@@ -23,5 +24,6 @@ private:
 	PhysicsSystem* physicsSystem;
 	BoxMovementSystem* boxMovementSystem;
 	KRenderer* kRenderer;
+	Client* client;
 };
 
