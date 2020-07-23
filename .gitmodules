@@ -1,0 +1,3 @@
+[submodule "client/include/kecs"]
+	path = client/include/kecs
+	url = https://github.com/MitchellHodzen/kecs.git
